@@ -10,6 +10,7 @@ public class Frame extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocation(100, 100);
         setSize(new Dimension(700, 600));
+        setResizable(false);
         setLayout(null);
         setTitle("Voronoi Diagram");
         add(panel);

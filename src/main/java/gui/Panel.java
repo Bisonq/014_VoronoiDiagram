@@ -12,11 +12,13 @@ public class Panel extends JPanel {
 
     private Set<Integer> set;
 
+    private Point intersectionPoint;
+
     public Panel() {
         super();
-        setBackground(Color.GRAY);
-        setLocation(100, 30);
-        setSize(new Dimension(500, 500));
+        setBackground(new Color(38, 38, 38));
+        setLocation(40, 30);
+        setSize(new Dimension(600, 500));
         this.set = new HashSet<>();
         drawNumbers(this.set);
     }
@@ -29,32 +31,36 @@ public class Panel extends JPanel {
         }
     }
 
-    public double getDistanceBetweenPoints(int x1, int y1, int x2, int y2){
-        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-    }
-
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+
+        if(set.isEmpty()){
+            set.clear();
+            drawNumbers(this.set);
+        }
+
+        Graphics2D g2d = (Graphics2D) g.create();
+
         Iterator<Integer> iterator = this.set.iterator();
 
         int x1 = iterator.next(), y1 = iterator.next();
         int x2 = iterator.next(), y2 = iterator.next();
         int x3 = iterator.next(), y3 = iterator.next();
 
-        g.setColor(Color.BLUE);
-        drawLineComponent(g, x1, y1, x2, y2);
+        g2d.setColor(Color.BLUE);
+        Line blueLine = drawLineComponent(g2d, x1, y1, x2, y2);
 
-        g.setColor(Color.GREEN);
-        drawLineComponent(g, x2, y2, x3, y3);
+        g2d.setColor(Color.GREEN);
+        Line greenLine = drawLineComponent(g2d, x2, y2, x3, y3);
 
-        g.setColor(Color.red);
-        drawLineComponent(g, x3, y3, x1, y1);
+        g2d.setColor(Color.red);
+        Line redLine = drawLineComponent(g2d, x3, y3, x1, y1);
 
-        drawIntersectionPointOfTwoLines(g, x1, y1, x2, y2, x3, y3);
+        drawIntersectionPointOfTwoLines(g2d, x1, y1, x2, y2, x3, y3);
     }
 
-    private void drawIntersectionPointOfTwoLines(Graphics g, int x1, int y1, int x2, int y2, int x3, int y3) {
+    private void drawIntersectionPointOfTwoLines(Graphics2D g, int x1, int y1, int x2, int y2, int x3, int y3) {
         Line line1 = new Line(x1, y1, x2, y2);
         Line pLine1 = new Line(-(1/line1.getA()), new Point(line1.getCenter()));
 
@@ -66,27 +72,44 @@ public class Panel extends JPanel {
         x = b/x;
         double y = (pLine1.getA() * x) + pLine1.getB();
 
+        this.intersectionPoint = new Point((int)x, (int)y);
+
+        g.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER));
         g.setColor(Color.yellow);
-        g.drawOval((int)(x - 3), (int)(y - 3), 6, 6);
-        g.fillOval((int)(x - 3), (int)(y - 3), 6, 6);
+        g.drawOval((int)(x - 2), (int)(y - 2), 4, 4);
+        g.fillOval((int)(x - 2), (int)(y - 2), 4, 4);
+        g.setStroke(new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER));
+        g.drawOval((int)(x - 7), (int)(y - 7), 14, 14);
     }
 
-    private void drawLineComponent(Graphics g, int x1, int y1, int x2, int y2) {
+    private Line drawLineComponent(Graphics2D g, int x1, int y1, int x2, int y2) {
+        drawTrianglePoints(g, x1, y1);
+        g.setStroke(new BasicStroke(3, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER));
         g.drawLine(x1, y1, x2, y2);
-//        g.drawOval(x1, y1, 4, 4);
-//        g.fillOval(x1, y1, 4, 4);
         Line line = new Line(x1, y1, x2, y2);
         Line pLine = new Line(-(1/line.getA()), new Point(line.getCenter()));
-        drawPerpendicularStraightLine(g, line, pLine);
+        return drawPerpendicularStraightLine(g, line, pLine);
     }
 
-    private void drawPerpendicularStraightLine(Graphics g, Line line, Line pLine) {
-        int y = 0;
-        double x = (y - pLine.getB())/pLine.getA();
-        g.drawLine((int)line.getCenter().getX(), (int)line.getCenter().getY(), (int)x, y);
+    private void drawTrianglePoints(Graphics2D g, int x1, int y1) {
+        g.drawOval(x1 - 4, y1 - 4, 8, 8);
+        g.fillOval(x1 - 4, y1 - 4, 8, 8);
 
-        y= 500;
-        x = (y - pLine.getB())/pLine.getA();
-        g.drawLine((int)line.getCenter().getX(), (int)line.getCenter().getY(), (int)x, y);
+        g.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER));
+        g.drawOval(x1 - 10, y1 - 10, 20, 20);
+    }
+
+    private Line drawPerpendicularStraightLine(Graphics2D g, Line line, Line pLine) {
+        g.setStroke(new BasicStroke(1, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER));
+
+        int y1 = 0;
+        double x1 = (y1 - pLine.getB())/pLine.getA();
+        g.drawLine((int)line.getCenter().getX(), (int)line.getCenter().getY(), (int)x1, y1);
+
+        int y2= 500;
+        double x2 = (y2 - pLine.getB())/pLine.getA();
+        g.drawLine((int)line.getCenter().getX(), (int)line.getCenter().getY(), (int)x2, y2);
+
+        return new Line((int)x1, y1, (int)x2, y2);
     }
 }
