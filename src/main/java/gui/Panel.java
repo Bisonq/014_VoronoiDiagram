@@ -50,6 +50,25 @@ public class Panel extends JPanel {
 
         g.setColor(Color.red);
         drawLineComponent(g, x3, y3, x1, y1);
+
+        drawIntersectionPointOfTwoLines(g, x1, y1, x2, y2, x3, y3);
+    }
+
+    private void drawIntersectionPointOfTwoLines(Graphics g, int x1, int y1, int x2, int y2, int x3, int y3) {
+        Line line1 = new Line(x1, y1, x2, y2);
+        Line pLine1 = new Line(-(1/line1.getA()), new Point(line1.getCenter()));
+
+        Line line2 = new Line(x2, y2, x3, y3);
+        Line pLine2 = new Line(-(1/line2.getA()), new Point(line2.getCenter()));
+
+        double x = (pLine1.getA() - pLine2.getA());
+        double b = (pLine2.getB() - pLine1.getB());
+        x = b/x;
+        double y = (pLine1.getA() * x) + pLine1.getB();
+
+        g.setColor(Color.yellow);
+        g.drawOval((int)(x - 3), (int)(y - 3), 6, 6);
+        g.fillOval((int)(x - 3), (int)(y - 3), 6, 6);
     }
 
     private void drawLineComponent(Graphics g, int x1, int y1, int x2, int y2) {
